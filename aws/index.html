@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Job Tracker 🚀</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    input, select {
+      padding: 10px;
+      margin: 5px;
+      width: 30%;
+    }
+
+    button {
+      padding: 10px 15px;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .status {
+      padding: 5px 10px;
+      border-radius: 5px;
+      color: white;
+      font-size: 12px;
+    }
+
+    .applied { background: gray; }
+    .interview { background: orange; }
+    .rejected { background: red; }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>💼 Job Application Tracker</h1>
+
+    <!-- Form -->
+    <div class="card">
+      <input id="company" placeholder="Company">
+      <input id="role" placeholder="Role">
+
+      <select id="status">
+        <option value="applied">Applied</option>
+        <option value="interview">Interview</option>
+        <option value="rejected">Rejected</option>
+      </select>
+
+      <button onclick="addJob()">Add Job</button>
+    </div>
+
+    <!-- Job List -->
+    <div id="jobList"></div>
+  </div>
+
+  <script>
+    const API_URL = "http://13.232.128.174:3000/jobs"; // replace later
+
+    // Fetch jobs
+async function loadJobs() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+
+    const jobList = document.getElementById("jobList");
+    jobList.innerHTML = "";
+
+    // ✅ If no jobs
+    if (data.length === 0) {
+      jobList.innerHTML = "<p>No jobs added yet.</p>";
+      return;
+    }
+
+    // ✅ Render jobs
+    data.forEach(job => {
+      const card = document.createElement("div");
+      card.className = "card";
+
+      card.innerHTML = `
+        <h3>${job.company}</h3>
+        <p><strong>Role:</strong> ${job.role}</p>
+        <p>
+          <strong>Status:</strong> 
+          <span class="status ${job.status}">
+            ${job.status.toUpperCase()}
+          </span>
+        </p>
+      `;
+
+      jobList.appendChild(card);
+    });
+
+  } catch (err) {
+    console.log("Backend not connected yet");
+  }
+}
+
+    // Add job
+    async function addJob() {
+      const company = document.getElementById("company").value;
+      const role = document.getElementById("role").value;
+      const status = document.getElementById("status").value;
+
+      const job = { company, role, status };
+
+      try {
+        await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(job)
+        });
+
+        loadJobs();
+      } catch (err) {
+        alert("Backend not connected yet!");
+      }
+    }
+
+    loadJobs();
+  </script>
+
+</body>
+</html>

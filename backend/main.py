@@ -64,4 +64,4 @@ def add_job(job: Job):
     cur.close()
     conn.close()
 
-    return {"message": "Job added successfully !!!!!!!!!!!"}
+    return {"message": "Job added successfully !!"}
